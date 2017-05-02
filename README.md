@@ -44,6 +44,9 @@ Example usage (with `aws-cli` for data sync):
 # "my-input-data.txt" is a folder with hadoop data format 
 aws s3 sync ./my-input-data.txt s3://my-s3-nlp-bucket/data/input.txt
 
+# create default roles if you've not used emr before
+aws emr create-default-roles
+
 ./bin/process.sh s3://my-s3-nlp-bucket/data/input.txt \
   s3://my-s3-nlp-bucket/data/output/tokenized.txt \
   s3://my-s3-nlp-bucket/data/output/lemmatized.txt
