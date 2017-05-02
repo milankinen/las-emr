@@ -7,12 +7,13 @@
 
 
 (defn ->config [local?]
-  (let [conf (c/app-name (c/spark-conf) "fin-nlp-preprocessor")]
+  (let [conf (c/app-name (c/spark-conf) "las-emr")]
     (if local?
       (-> conf
           (c/master "local[4]")
           (c/set "spark.executor.memory", "2g")))
     conf))
+
 
 (defn -main [& [remote? input-file tokenized-file lemmatized-file]]
   (println "Run arguments"
@@ -22,7 +23,6 @@
            "\n  Lemmatized output:" lemmatized-file)
   (s/with-context sc (->config (not= "true" (str remote?)))
     (let [processed (->> (s/text-file sc input-file)
-                         (s/filter (fn [line] (not-empty (string/trim line))))
                          (s/map process)
                          (s/cache))]
       (->> processed
