@@ -5,6 +5,7 @@
                  [fi.seco/lexicalanalysis "1.5.4"]]
   :aot [#".*" sparkling.serialization sparkling.destructuring]
   :main las-emr.core
+  :jar-name "las-emr.jar"
   :source-paths ["src/main"]
   :profiles {:provided
              {:dependencies
@@ -14,4 +15,4 @@
              {:dependencies [[amazonica "0.3.95"]
                              [progrock "0.1.2"]]
               :source-paths ["src/main" "src/infra"]}}
-  :aliases {})
+  :aliases {"deploy-binaries" ["run" "-m" "las-emr.aws/deploy-binaries!" :project/version]})
