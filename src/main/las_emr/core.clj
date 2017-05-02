@@ -26,9 +26,9 @@
                          (s/map process)
                          (s/cache))]
       (->> processed
-           (s/map (fn [tokens] (string/join " " (map :baseform tokens))))
+           (s/map (fn [[ok? tokens]] (str (if ok? "ok" "nok") "\t" (string/join " " (map :baseform tokens)))))
            (s/save-as-text-file lemmatized-file))
       (->> processed
-           (s/map (fn [tokens] (string/join " " (map :wordform tokens))))
+           (s/map (fn [[ok? tokens]] (str (if ok? "ok" "nok") "\t" (string/join " " (map :wordform tokens)))))
            (s/save-as-text-file tokenized-file)))))
 

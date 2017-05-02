@@ -1,12 +1,12 @@
 (ns las-emr.text
-  (:require [clojure.string :as string])
+  (:require [clojure.string :as string]
+            [clojure.tools.logging :refer [error]])
   (:import (fi.seco.lexical.combined CombinedLexicalAnalysisService)
            (java.util Locale)))
 
 (definterface ILas
   (processText [^String text opts]))
 
-;// text, language, inflections, baseformSegments, guessUnknown, segmentUnknown, maxErrorCorrectDistance, depth
 (def ^:private las
   (proxy [CombinedLexicalAnalysisService ILas] []
     (processText [text opts]
@@ -26,21 +26,27 @@
 ; ====
 
 (defn process [text]
-  (let [opts {:baseform-segments? true
-              :guess-unknown?     true
-              :segment-unknown?   true
-              :max-error-distance 1
-              :depth              1}]
-    (.processText las text opts)))
+  (try
+    (let [opts {:baseform-segments? true
+                :guess-unknown?     true
+                :segment-unknown?   true
+                :max-error-distance 1
+                :depth              1}]
+      (if (empty? text)
+        [true []]
+        [true (.processText las text opts)]))
+    (catch Throwable e
+      (error e "Got error while processing text:" text)
+      [false []])))
 
 
 #_(process "Helsingissä sataa lumipalloja ja Pariisissa paistaa aurinko.")
 ; =>
-; [["Helsingissä" "Helsinki"]
-;  ["sataa" "sataa"]
-;  ["lumipalloja" "lumipallo"]
-;  ["ja" "ja"]
-;  ["Pariisissa" "Pariisi"]
-;  ["paistaa" "paistaa"]
-;  ["aurinko" "aurinko"]
-;  ["." "."]]
+; [true [["Helsingissä" "Helsinki"]
+;        ["sataa" "sataa"]
+;        ["lumipalloja" "lumipallo"]
+;        ["ja" "ja"]
+;        ["Pariisissa" "Pariisi"]
+;        ["paistaa" "paistaa"]
+;        ["aurinko" "aurinko"]
+;        ["." "."]]]
