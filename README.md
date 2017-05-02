@@ -37,7 +37,7 @@ and binaries)
 ## Usage
 
 1. Copy your input data into S3 bucket
-1. Process your S3 text data: `./bin/process.sh <input-filename> <tokenized-filename> <lemmatized-filename>`
+1. Process your S3 text data with `bin/process.sh` script (use `--help` for more info)
 
 Example usage (with `aws-cli` for data sync):
 ```bash 

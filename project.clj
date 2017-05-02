@@ -13,6 +13,8 @@
                [org.apache.spark/spark-sql_2.10 "2.1.0"]]}
              :dev
              {:dependencies [[amazonica "0.3.95"]
-                             [progrock "0.1.2"]]
+                             [progrock "0.1.2"]
+                             [org.clojure/tools.cli "0.3.5"]]
               :source-paths ["src/main" "src/infra"]}}
-  :aliases {"deploy-binaries" ["run" "-m" "las-emr.aws/deploy-binaries!" :project/version]})
+  :aliases {"deploy-binaries" ["run" "-m" "las-emr.aws/deploy-binaries!" :project/version]
+            "process-emr"     ^:pass-through-help ["run" "-m" "las-emr.aws/process-emr!"]})

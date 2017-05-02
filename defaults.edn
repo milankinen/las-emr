@@ -1,0 +1,18 @@
+{:name           "las-emr"
+ :log-uri        "s3n://$BUCKET/logs"
+ :release-label  "emr-5.4.0"
+ :applications   [{:name "Spark"}]
+ :configurations [{:classification "spark"
+                   :properties     {"maximizeResourceAllocation" "true"}}
+                  {:classification "spark-defaults"
+                   :properties     {"spark.executor.memory" "4608m"
+                                    "spark.executor.cores"  "2"}}]
+ :service-role   "EMR_DefaultRole"
+ :job-flow-role  "EMR_EC2_DefaultRole"
+ :instances      {:instance-groups
+                  [{:instance-type  "m1.medium"
+                    :instance-role  "MASTER"
+                    :instance-count 1}
+                   {:instance-type  "m1.large"
+                    :instance-role  "CORE"
+                    :instance-count 5}]}}
