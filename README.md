@@ -95,7 +95,7 @@ Here is an example configuration with custom cluster name and `c4.xlarge` core n
 And starting the job:
 ```bash
 ./bin/process.sh \
-  --config my_custom_cluster.edn \
+  --conf my_custom_cluster.edn \
   --bucket my-finnlp-bucket \
   --input s3n://my-finnlp-bucket/data/input/bigdata.txt \
   --tokens s3n://my-finnlp-bucket/data/output/tokenized.txt \
