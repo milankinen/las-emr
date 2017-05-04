@@ -3,6 +3,7 @@
             [sparkling.core :as s]
             [clojure.string :as string]
             [las-emr.text :refer [process]])
+  (:import (org.apache.spark.api.java StorageLevels))
   (:gen-class))
 
 
@@ -24,7 +25,7 @@
   (s/with-context sc (->config (not= "true" (str remote?)))
     (let [processed (->> (s/text-file sc input-file)
                          (s/map process)
-                         (s/cache))]
+                         (s/storage-level! StorageLevels/DISK_ONLY))]
       (->> processed
            (s/map (fn [[ok? tokens]] (str (if ok? "ok" "nok") "\t" (string/join " " (map :baseform tokens)))))
            (s/save-as-text-file lemmatized-file))
