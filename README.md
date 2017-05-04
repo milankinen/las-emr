@@ -29,11 +29,6 @@ and binaries)
 1. Deploy the binaries: `./bin/deploy.sh <your-bucket-name>`
 
 
-## Configuring the EMR cluster
-
-`TODO`
-
-
 ## Usage
 
 1. Copy your input data into S3 bucket
@@ -47,15 +42,65 @@ aws s3 sync ./my-input-data.txt s3://my-s3-nlp-bucket/data/input.txt
 # create default roles if you've not used emr before
 aws emr create-default-roles
 
-./bin/process.sh s3://my-s3-nlp-bucket/data/input.txt \
-  s3://my-s3-nlp-bucket/data/output/tokenized.txt \
-  s3://my-s3-nlp-bucket/data/output/lemmatized.txt
+./bin/process.sh \
+  --bucket my-finnlp-bucket \
+  --input s3n://my-finnlp-bucket/data/input/mydata.txt \
+  --tokens s3n://my-finnlp-bucket/data/output/tokenized.txt \
+  --lemmas s3n://my-finnlp-bucket/data/output/lemmatized.txt
 ```
 
 `process.sh` creates a new *"las-emr"* named cluster that processes the given input file and
 terminates automatically when the job is completed. If you want to examine the progress of
 the processing job, you can do it by using [Spark Web UI](http://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-spark-history.html).
 
+
+## Custom EMR flow configurations
+
+The default configuration uses `m1.large` instances for `CORE` nodes because they
+don't have any special requirements for the cluster. However, `m1.*` instances are
+pretty slow (single `m1.large` instance can process approximately 2.3 MB Finnish text
+per hour) so it's recommended to use `c4.*` instances instead.
+
+You can customize the flow and cluster configurations by using `--config my_config.edn`
+flag. The contents of your configuration file will be merged to `defaults.edn` configurations.
+For full configuration options, please see [amazonica](https://github.com/mcohen01/amazonica)
+documentation.
+
+**ATTENTION!** When using custom instance types, remember to set executor memory and core settings 
+to utilize the maximum resources of your instances. Your instances should have big enough so that
+each executors get at least `3G` memory. The EMR specs for different instance types can be found 
+[here](http://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-hadoop-task-config.html).
+
+Here is an example configuration with custom cluster name and `c4.xlarge` core nodes:
+```clojure
+; my_custom_cluster.edn
+{:name           "big-spot-las"
+ :configurations [{:classification "spark"
+                    :properties     {"maximizeResourceAllocation" "true"}}
+                   {:classification "spark-defaults"
+                    :properties     {"spark.executor.memory" "5120m"
+                                     "spark.executor.cores"  "4"}}]
+ :instances       {:ec2-subnet-id 
+                   "subnet-abc12345"    ; required for c4 instances
+                   :instance-groups
+                   [{:instance-type  "m1.medium"
+                     :instance-role  "MASTER"
+                     :instance-count 1}
+                    {:instance-type  "c4.xlarge"
+                     :instance-role  "CORE"
+                     :instance-count 100
+                     :market         "SPOT"
+                     :bid-price      "0.06"}]}}
+```
+And starting the job:
+```bash
+./bin/process.sh \
+  --config my_custom_cluster.edn \
+  --bucket my-finnlp-bucket \
+  --input s3n://my-finnlp-bucket/data/input/bigdata.txt \
+  --tokens s3n://my-finnlp-bucket/data/output/tokenized.txt \
+  --lemmas s3n://my-finnlp-bucket/data/output/lemmatized.txt
+```
 
 ## License
 
