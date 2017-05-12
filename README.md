@@ -102,6 +102,13 @@ And starting the job:
   --lemmas s3n://my-finnlp-bucket/data/output/lemmatized.txt
 ```
 
+## Some thoughts about time and costs
+
+One `c4.xlarge` instance (with the configurations shown as above) can process Finnish
+text approximately **6.2 MB/hour** which means that with a cluster of 100 instances, 
+you can process approximately *10 GB* of data in *16,2 hours*. If you're using spot 
+market with e.g. *$0.06/h* price cap, the cost for this job will be approximately __$185__. 
+
 ## License
 
 GNU GPLv3
